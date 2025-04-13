@@ -7,12 +7,16 @@ import {
   AccountCircleRounded,
   LogoutRounded,
   DocumentScanner,
+  AttachMoney,
+  ListAlt,
+  ShoppingBasket,
 } from "@mui/icons-material";
 import React from "react";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { NavLink, Outlet } from "react-router-dom";
 
 const MainLayout = () => {
+  const admin = true;
   return (
     <div className="flex">
       <div>
@@ -45,22 +49,32 @@ const MainLayout = () => {
             </MenuItem>
 
             <SubMenu label="আয় ও ব্যয়" icon={<AccountBalanceWalletRounded />}>
-              <MenuItem component={<NavLink to="/Income" />}>আয়</MenuItem>
-              <MenuItem component={<NavLink to="/Expense" />}>ব্যয়</MenuItem>
+              <MenuItem component={<NavLink to="/incomeForm" />}>
+                <AttachMoney style={{ color: "black" }} /> আয়
+              </MenuItem>
+              <MenuItem component={<NavLink to="/incomeList" />}>
+                <ListAlt style={{ color: "black" }} /> আয় লিস্ট
+              </MenuItem>
+              <MenuItem component={<NavLink to="/expenseForm" />}>
+                <AttachMoney style={{ color: "black" }} /> ব্যয়
+              </MenuItem>
+              <MenuItem component={<NavLink to="/expenseList" />}>
+                <ListAlt style={{ color: "black" }} /> ব্যয় লিস্ট
+              </MenuItem>
             </SubMenu>
 
             <SubMenu label="মুদির তালিকা" icon={<ShoppingCartRounded />}>
-              <MenuItem component={<NavLink to="/create-GroceryList" />}>
-                নতুন মুদির তালিকা
+              <MenuItem component={<NavLink to="/grocery" />}>
+                <ShoppingBasket style={{ color: "black" }} /> নতুন মুদির তালিকা
               </MenuItem>
-              <MenuItem component={<NavLink to="/Grocery List" />}>
-                মুদির তালিকা দেখুন
+              <MenuItem component={<NavLink to="/GroceryList" />}>
+                <ListAlt style={{ color: "black" }} /> মুদির তালিকা দেখুন
               </MenuItem>
             </SubMenu>
 
             <MenuItem
               icon={<TaskRounded />}
-              component={<NavLink to="/Task-Manager" />}
+              component={<NavLink to="/taskhome" />}
             >
               টাস্ক ম্যানেজার
             </MenuItem>
@@ -79,12 +93,21 @@ const MainLayout = () => {
               ডকুমেন্টস ও নোটস
             </MenuItem>
 
-            <MenuItem
-              icon={<AccountCircleRounded />}
-              component={<NavLink to="/profile" />}
-            >
-              প্রোফাইল
-            </MenuItem>
+            {admin === true ? (
+              <MenuItem
+                icon={<AccountCircleRounded />}
+                component={<NavLink to="/profile" />}
+              >
+                প্রোফাইল
+              </MenuItem>
+            ) : (
+              <MenuItem
+                icon={<AccountCircleRounded />}
+                component={<NavLink to="/profile" />}
+              >
+                প্রোফাইল2
+              </MenuItem>
+            )}
 
             <MenuItem
               icon={<LogoutRounded />}

@@ -92,12 +92,14 @@ const Dashboard = () => {
             style={{ width: `${budgetPercentage}%` }}
           ></div>
         </div>
-       <div className="flex justify-between items-center mt-2 text-gray-700">
-       <h1 className="text-sm text-red-500">অবশিষ্ট বাজেটঃ ৳ {enToBnNumber(remainingBudget)}</h1>
-       <p className="text-right text-sm mt-1 text-gray-500">
-          {enToBnNumber(budgetPercentage)}% খরচ হয়েছে
-        </p>
-       </div>
+        <div className="flex justify-between items-center mt-2 text-gray-700">
+          <h1 className="text-sm text-red-500">
+            অবশিষ্ট বাজেটঃ ৳ {enToBnNumber(remainingBudget)}
+          </h1>
+          <p className="text-right text-sm mt-1 text-gray-500">
+            {enToBnNumber(budgetPercentage)}% খরচ হয়েছে
+          </p>
+        </div>
       </section>
 
       {/* Modal */}
