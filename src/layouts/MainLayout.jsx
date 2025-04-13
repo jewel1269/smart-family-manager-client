@@ -10,6 +10,7 @@ import {
   AttachMoney,
   ListAlt,
   ShoppingBasket,
+  AddCircleOutline,
 } from "@mui/icons-material";
 import React from "react";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
@@ -42,52 +43,61 @@ const MainLayout = () => {
             }}
           >
             <MenuItem
-              icon={<DashboardRounded />}
+              icon={<DashboardRounded style={{ color: "#1e88e5" }} />}
               component={<NavLink to="/dashboard" />}
             >
               ড্যাশবোর্ড
             </MenuItem>
 
-            <SubMenu label="আয় ও ব্যয়" icon={<AccountBalanceWalletRounded />}>
+            <SubMenu
+              label="আয় ও ব্যয়"
+              icon={
+                <AccountBalanceWalletRounded style={{ color: "#4caf50" }} />
+              }
+            >
               <MenuItem component={<NavLink to="/incomeForm" />}>
-                <AttachMoney style={{ color: "black" }} /> আয়
+                <AddCircleOutline style={{ color: "#ff9800" }} /> আয় লিখো
               </MenuItem>
               <MenuItem component={<NavLink to="/incomeList" />}>
-                <ListAlt style={{ color: "black" }} /> আয় লিস্ট
+                <ListAlt style={{ color: "#ff9800" }} /> আয় দেখো
               </MenuItem>
               <MenuItem component={<NavLink to="/expenseForm" />}>
-                <AttachMoney style={{ color: "black" }} /> ব্যয়
+                <AddCircleOutline style={{ color: "#ff5722" }} /> ব্যয় সংযোজন 
               </MenuItem>
               <MenuItem component={<NavLink to="/expenseList" />}>
-                <ListAlt style={{ color: "black" }} /> ব্যয় লিস্ট
+                <ListAlt style={{ color: "#ff5722" }} /> ব্যয় দেখো
               </MenuItem>
             </SubMenu>
 
-            <SubMenu label="মুদির তালিকা" icon={<ShoppingCartRounded />}>
+            <SubMenu
+              label="মুদির তালিকা"
+              icon={<ShoppingCartRounded style={{ color: "#8bc34a" }} />}
+            >
               <MenuItem component={<NavLink to="/grocery" />}>
-                <ShoppingBasket style={{ color: "black" }} /> নতুন মুদির তালিকা
+                <ShoppingBasket style={{ color: "#ff7043" }} /> নতুন মুদির
+                তালিকা
               </MenuItem>
               <MenuItem component={<NavLink to="/GroceryList" />}>
-                <ListAlt style={{ color: "black" }} /> মুদির তালিকা দেখুন
+                <ListAlt style={{ color: "#ff7043" }} /> মুদির তালিকা দেখুন
               </MenuItem>
             </SubMenu>
 
             <MenuItem
-              icon={<TaskRounded />}
+              icon={<TaskRounded style={{ color: "#9c27b0" }} />}
               component={<NavLink to="/taskhome" />}
             >
               টাস্ক ম্যানেজার
             </MenuItem>
 
             <MenuItem
-              icon={<SavingsRounded />}
+              icon={<SavingsRounded style={{ color: "#673ab7" }} />}
               component={<NavLink to="/Loan-Saving" />}
             >
               ঋণ ও সঞ্চয়
             </MenuItem>
 
             <MenuItem
-              icon={<DocumentScanner />}
+              icon={<DocumentScanner style={{ color: "#607d8b" }} />}
               component={<NavLink to="/Documents-Notes" />}
             >
               ডকুমেন্টস ও নোটস
@@ -95,14 +105,14 @@ const MainLayout = () => {
 
             {admin === true ? (
               <MenuItem
-                icon={<AccountCircleRounded />}
+                icon={<AccountCircleRounded style={{ color: "#3f51b5" }} />}
                 component={<NavLink to="/profile" />}
               >
                 প্রোফাইল
               </MenuItem>
             ) : (
               <MenuItem
-                icon={<AccountCircleRounded />}
+                icon={<AccountCircleRounded style={{ color: "#3f51b5" }} />}
                 component={<NavLink to="/profile" />}
               >
                 প্রোফাইল2
@@ -110,7 +120,7 @@ const MainLayout = () => {
             )}
 
             <MenuItem
-              icon={<LogoutRounded />}
+              icon={<LogoutRounded style={{ color: "#f44336" }} />}
               component={<NavLink to="/logout" />}
             >
               লগআউট
