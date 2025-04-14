@@ -9,6 +9,8 @@ import GroceryList from "../features/grocery/grocery-list";
 import TaskHome from "../features/task/task-home";
 import ExpenseList from "../features/forms/expanse-form/expense-list";
 import IncomeList from "../features/forms/income-form/income-list";
+import Savings from "../features/savings/savings";
+import DocumentManager from "../features/document-manager/document-manager";
 
 const routes = createBrowserRouter([
   {
@@ -51,6 +53,14 @@ const routes = createBrowserRouter([
       {
         path: "/taskhome",
         element: <TaskHome />,
+      },
+      {
+        path: "/savings",
+        element: <Savings />,
+      },
+      {
+        path: "/documentManager",
+        element: <DocumentManager />,
       },
     ],
   },

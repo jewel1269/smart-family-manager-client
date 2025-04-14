@@ -1,4 +1,6 @@
+import { Notifications } from "@mui/icons-material";
 import React from "react";
+import { NavLink } from "react-router-dom";
 
 const Dashboard = () => {
   const [budget, setBudget] = React.useState("২০০০");
@@ -38,7 +40,13 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">📊 ড্যাশবোর্ড</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">📊 ড্যাশবোর্ড</h1>
+        <div className="flex items-center gap-1 mb-4">
+          <Notifications style={{ fontSize: 30, color: "red" }} />
+          <h2 className="text-lg font-semibold text-gray-800">নোটিফিকেশন (0)</h2>
+        </div>
+      </div>
 
       {/* আজকের সারাংশ */}
       <section className="bg-white rounded-2xl shadow-md p-6 mb-6">
@@ -140,18 +148,33 @@ const Dashboard = () => {
           ⚡ দ্রুত এক্সেস শর্টকাট
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl shadow">
+          <NavLink
+            to="/expenseForm"
+            className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl shadow flex items-center justify-center text-center"
+          >
             ➕ খরচ যোগ করুন
-          </button>
-          <button className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl shadow">
+          </NavLink>
+
+          <NavLink
+            to="/incomeForm"
+            className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl shadow flex items-center justify-center text-center"
+          >
             ➕ আয় যোগ করুন
-          </button>
-          <button className="bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-xl shadow">
+          </NavLink>
+
+          <NavLink
+            to="/report"
+            className="bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-xl shadow flex items-center justify-center text-center"
+          >
             📈 রিপোর্ট দেখুন
-          </button>
-          <button className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-xl shadow">
+          </NavLink>
+
+          <NavLink
+            to="/settings"
+            className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-xl shadow flex items-center justify-center text-center"
+          >
             ⚙️ সেটিংস
-          </button>
+          </NavLink>
         </div>
       </section>
     </div>

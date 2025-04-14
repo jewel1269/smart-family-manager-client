@@ -91,14 +91,14 @@ const MainLayout = () => {
 
             <MenuItem
               icon={<SavingsRounded style={{ color: "#673ab7" }} />}
-              component={<NavLink to="/Loan-Saving" />}
+              component={<NavLink to="/savings" />}
             >
               ঋণ ও সঞ্চয়
             </MenuItem>
 
             <MenuItem
               icon={<DocumentScanner style={{ color: "#607d8b" }} />}
-              component={<NavLink to="/Documents-Notes" />}
+              component={<NavLink to="/documentManager" />}
             >
               ডকুমেন্টস ও নোটস
             </MenuItem>
