@@ -1,9 +1,9 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { AddIncome } from "../post-form-data";
 import { useNavigate } from "react-router-dom";
 import useEmail from "../../auth/email";
+import { AddIncome } from './post-form-data';
 
 const IncomeForm = () => {
   const {

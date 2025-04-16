@@ -1,5 +1,9 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import useEmail from "../../auth/email";
+import { useNavigate } from "react-router-dom";
+import { AddCost } from "./post-cost-data";
 
 const ExpenseForm = () => {
   const {
@@ -12,11 +16,44 @@ const ExpenseForm = () => {
   const [successMsg, setSuccessMsg] = useState("");
   const [image, setImage] = useState(null);
 
-  const onSubmit = (data) => {
-    console.log("🔴 খরচ তথ্য:", data);
-    setSuccessMsg("✅ খরচ সফলভাবে সংরক্ষণ করা হয়েছে!");
-    reset();
-    setTimeout(() => setSuccessMsg(""), 4000);
+  const imgbbApiKey = "82c726e9918f37b82da10ff4866d0fc0";
+  const navigate = useNavigate();
+  const email = useEmail();
+
+
+  const onSubmit = async (data) => {
+    try {
+      let imageUrl = "";
+      if (data.documentImage && data.documentImage.length > 0) {
+        const imageFile = data.documentImage[0];
+        const formData = new FormData();
+        formData.append("image", imageFile);
+
+        const response = await axios.post(
+          `https://api.imgbb.com/1/upload?key=${imgbbApiKey}`,
+          formData
+        );
+        imageUrl = response.data.data.url;
+      }
+
+      // যেটা সার্ভারে পাঠাবে
+      const incomeData = {
+        email:email, 
+        category: data.category,
+        cost: parseFloat(data.amount),
+        paymentMethod: data.paymentMethod,
+        date: data.date,
+        note: data.note,
+        attachmentImage: imageUrl,
+      };
+      AddCost(incomeData, navigate);
+      console.log("রেজিস্ট্রেশন তথ্য:", incomeData);
+      setSuccessMsg("✅ আয় সফলভাবে সংরক্ষণ করা হয়েছে!");
+      reset();
+      setImage(null);
+    } catch (error) {
+      console.error("ইমেজ আপলোডে সমস্যা:", error);
+    }
   };
 
   const today = new Date().toISOString().split("T")[0];
@@ -135,7 +172,7 @@ const ExpenseForm = () => {
           </label>
           <input
             type="file"
-            {...register("attachment")}
+            {...register("documentImage")}
             className="w-full"
             onChange={(e) => {
               if (e.target.files[0]) {

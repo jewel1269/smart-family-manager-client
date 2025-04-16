@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BaseUri } from "../../constants/uri";
+import { BaseUri } from "../../../constants/uri";
 
 class IncomeQueue {
   constructor() {

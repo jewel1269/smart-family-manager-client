@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { AddGrocery } from "./post-grocery-data";
+import { useNavigate } from "react-router-dom";
+import useEmail from "../auth/email";
 
 const Grocery = () => {
   const {
@@ -10,10 +13,21 @@ const Grocery = () => {
   } = useForm();
 
   const [successMsg, setSuccessMsg] = useState("");
-  const [image, setImage] = useState(null);
+  const navigate = useNavigate();
+  const email = useEmail();
 
   const onSubmit = (data) => {
-    console.log("🛒 বাজার তথ্য:", data);
+    const groceryData = {
+      email: email,
+      title: data?.title,
+      buyer: data?.buyer,
+      price: data?.price,
+      note: data?.note,
+      date: data?.date,
+      category: data?.category,
+    };
+    console.log(groceryData);
+    AddGrocery(groceryData, navigate);
     setSuccessMsg("✅ বাজারের তথ্য সফলভাবে সংরক্ষণ করা হয়েছে!");
     reset();
     setTimeout(() => setSuccessMsg(""), 4000);
@@ -52,7 +66,9 @@ const Grocery = () => {
 
         {/* ক্যাটাগরি */}
         <div>
-          <label className="block text-gray-700 font-medium mb-1">📂 ক্যাটাগরি</label>
+          <label className="block text-gray-700 font-medium mb-1">
+            📂 ক্যাটাগরি
+          </label>
           <select
             {...register("category", { required: true })}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-green-400"
@@ -64,13 +80,17 @@ const Grocery = () => {
             <option value="অন্যান্য">অন্যান্য</option>
           </select>
           {errors.category && (
-            <p className="text-red-500 text-sm mt-1">একটি ক্যাটাগরি নির্বাচন করুন।</p>
+            <p className="text-red-500 text-sm mt-1">
+              একটি ক্যাটাগরি নির্বাচন করুন।
+            </p>
           )}
         </div>
 
         {/* মূল্য */}
         <div>
-          <label className="block text-gray-700 font-medium mb-1">💰 মূল্য (৳)</label>
+          <label className="block text-gray-700 font-medium mb-1">
+            💰 মূল্য (৳)
+          </label>
           <input
             type="number"
             {...register("price", { required: true, min: 1 })}
@@ -84,7 +104,9 @@ const Grocery = () => {
 
         {/* কস্ট দাতা */}
         <div>
-          <label className="block text-gray-700 font-medium mb-1">🧍‍♂️ কে কিনেছে?</label>
+          <label className="block text-gray-700 font-medium mb-1">
+            🧍‍♂️ কে কিনেছে?
+          </label>
           <input
             type="text"
             {...register("buyer", { required: true })}
@@ -98,7 +120,9 @@ const Grocery = () => {
 
         {/* তারিখ */}
         <div>
-          <label className="block text-gray-700 font-medium mb-1">📅 কেনার তারিখ</label>
+          <label className="block text-gray-700 font-medium mb-1">
+            📅 কেনার তারিখ
+          </label>
           <input
             type="date"
             defaultValue={today}
@@ -120,29 +144,6 @@ const Grocery = () => {
             rows={3}
           />
         </div>
-
-        {/* ছবি */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-1">📷 ছবি (ঐচ্ছিক)</label>
-          <input
-            type="file"
-            {...register("attachment")}
-            className="w-full"
-            onChange={(e) => {
-              if (e.target.files[0]) {
-                setImage(e.target.files[0]);
-              }
-            }}
-          />
-        </div>
-
-        {image && (
-          <img
-            src={URL.createObjectURL(image)}
-            alt="Attachment Preview"
-            className="mt-2 w-32 h-32 object-cover rounded-lg"
-          />
-        )}
 
         {/* সাবমিট */}
         <div className="text-center">
