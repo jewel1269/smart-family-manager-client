@@ -11,58 +11,41 @@ import ExpenseList from "../features/forms/expanse-form/expense-list";
 import IncomeList from "../features/forms/income-form/income-list";
 import Savings from "../features/savings/savings";
 import DocumentManager from "../features/document-manager/document-manager";
+import Login from "../features/auth/Login";
+import PrivateRoute from "./PrivateRoute";
+import Register from "../features/auth/Register";
+
 
 const routes = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <PrivateRoute>
+        <MainLayout />
+      </PrivateRoute>
+    ),
     errorElement: <div>404 Not Found</div>,
     children: [
-      {
-        path: "/dashboard",
-        element: <Dashboard />,
-      },
-      {
-        path: "/expenseForm",
-        element: <ExpenseForm />,
-      },
-      {
-        path: "/expenseList",
-        element: <ExpenseList />,
-      },
-      {
-        path: "/incomeForm",
-        element: <IncomeForm />,
-      },
-      {
-        path: "/incomeList",
-        element: <IncomeList />,
-      },
-      {
-        path: "/profile",
-        element: <Profile />,
-      },
-      {
-        path: "/grocery",
-        element: <Grocery />,
-      },
-      {
-        path: "/groceryList",
-        element: <GroceryList />,
-      },
-      {
-        path: "/taskhome",
-        element: <TaskHome />,
-      },
-      {
-        path: "/savings",
-        element: <Savings />,
-      },
-      {
-        path: "/documentManager",
-        element: <DocumentManager />,
-      },
+      { path: "/dashboard", element: <Dashboard /> },
+      { path: "/expenseForm", element: <ExpenseForm /> },
+      { path: "/expenseList", element: <ExpenseList /> },
+      { path: "/incomeForm", element: <IncomeForm /> },
+      { path: "/incomeList", element: <IncomeList /> },
+      { path: "/profile", element: <Profile /> },
+      { path: "/grocery", element: <Grocery /> },
+      { path: "/groceryList", element: <GroceryList /> },
+      { path: "/taskhome", element: <TaskHome /> },
+      { path: "/savings", element: <Savings /> },
+      { path: "/documentManager", element: <DocumentManager /> },
     ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
   },
 ]);
 

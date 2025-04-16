@@ -1,65 +1,80 @@
 import React, { useState } from "react";
 import enToBn from "../../en-to-bn/en-to-bn";
+import useIncomeData from "../../../hooks/useIncomeData";
 
 const IncomeList = () => {
-  const [expenses, setExpenses] = useState([
-    {
-      category: "বেতন",
-      amount: 150,
-      paymentMethod: "নগদ",
-      date: "2025-04-10",
-      note: "দুপুরের খাবার",
-      image: "https://via.placeholder.com/100",
-    },
-    {
-      category: "ফ্রিল্যান্সিং",
-      amount: 60,
-      paymentMethod: "বিকাশ",
-      date: "2025-04-13",
-      note: "অফিস যাওয়ার গাড়ি",
-      image: "https://via.placeholder.com/100",
-    },
-    {
-      category: "বিজনেস",
-      amount: 300,
-      paymentMethod: "নগদ অ্যাপ",
-      date: "2025-04-11",
-      note: "ডাক্তারের ফি",
-      image: "https://via.placeholder.com/100",
-    },
-  ]);
+  const { data } = useIncomeData();
+  const incomes = data?.data || [];
 
   const [filterDate, setFilterDate] = useState("");
 
-  const filteredAndSortedExpenses = [...expenses]
-    .filter((expense) => {
-      if (!filterDate) return true;
-      return expense.date === filterDate;
-    })
+  // Function to group by month (Year-Month format: YYYY-MM)
+  const groupByMonth = (incomes) => {
+    return incomes.reduce((acc, income) => {
+      const month = income.date.slice(0, 7); // Extract Year-Month (YYYY-MM)
+      if (!acc[month]) {
+        acc[month] = [];
+      }
+      acc[month].push(income);
+      return acc;
+    }, {});
+  };
 
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
-  
+  // Group incomes by month
+  const groupedIncomes = groupByMonth(incomes);
+
+  // Get filtered and sorted incomes
+  const filteredAndSortedIncomes = Object.entries(groupedIncomes)
+    .map(([month, incomesForMonth]) => {
+      const totalMonthIncome = incomesForMonth.reduce(
+        (acc, income) => acc + income.income,
+        0
+      );
+      return {
+        month,
+        incomes: incomesForMonth,
+        totalIncome: totalMonthIncome,
+      };
+    })
+    .filter(({ month }) => {
+      if (!filterDate) return true;
+      return month === filterDate.slice(0, 7); // Compare only Year-Month part
+    })
+    .sort((a, b) => new Date(b.month) - new Date(a.month)); // Sort by month
+
   return (
     <div className="max-w-7xl mx-auto mt-10 p-6 bg-white shadow-xl rounded-xl">
       <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
         💳 আয়ের তালিকা (ছবিসহ)
       </h2>
 
-      <div className="flex justify-end items-center mb-4">
-        <label className="mr-2 font-semibold">🔍 তারিখ বাছাই করুন:</label>
-        <input
-          type="date"
-          value={filterDate}
-          onChange={(e) => setFilterDate(e.target.value)}
-          className="border rounded px-2 py-1"
-        />
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-xl font-bold">
+          মোট আয়: ৳{" "}
+          {enToBn(
+            filteredAndSortedIncomes.reduce(
+              (acc, item) => acc + item.totalIncome,
+              0
+            )
+          )}
+        </h1>
+
+        <div className="flex items-center">
+          <label className="mr-2 font-semibold">🔍 মাস বাছাই করুন:</label>
+          <input
+            type="month"
+            value={filterDate}
+            onChange={(e) => setFilterDate(e.target.value)}
+            className="border rounded px-2 py-1"
+          />
+        </div>
       </div>
 
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
             <tr className="bg-blue-100 text-gray-700 text-center">
-              <th className="py-2 px-4 border">📅 তারিখ</th>
+              <th className="py-2 px-4 border">📅 মাস</th>
               <th className="py-2 px-4 border">🏷️ ক্যাটাগরি</th>
               <th className="py-2 px-4 border">💸 পরিমাণ</th>
               <th className="py-2 px-4 border">💳 পেমেন্ট মাধ্যম</th>
@@ -68,34 +83,56 @@ const IncomeList = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredAndSortedExpenses.length > 0 ? (
-              filteredAndSortedExpenses.map((expense, index) => (
-                <tr
-                  key={index}
-                  className="text-center border-b hover:bg-gray-100"
-                >
-                  <td className="py-2 px-4 border">{expense.date}</td>
-                  <td className="py-2 px-4 border">{expense.category}</td>
-                 <td className="py-2 px-4 border">৳ {enToBn(expense.amount)}</td>
-                  <td className="py-2 px-4 border">{expense.paymentMethod}</td>
-                  <td className="py-2 px-4 border">{expense.note || "—"}</td>
-                  <td className="py-2 px-4 border">
-                    {expense.image ? (
-                      <img
-                        src={expense.image}
-                        alt="Income"
-                        className="w-12 h-12 object-cover rounded"
-                      />
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                </tr>
-              ))
+            {filteredAndSortedIncomes.length > 0 ? (
+              filteredAndSortedIncomes.map(
+                ({ month, incomes, totalIncome }, index) => (
+                  <React.Fragment key={index}>
+                    <tr>
+                      <td
+                        colSpan="6"
+                        className="py-4 px-4 text-center text-xl font-semibold"
+                      >
+                        {month} - মোট আয়: ৳ {enToBn(totalIncome)}
+                      </td>
+                    </tr>
+                    {incomes.map((income, i) => (
+                      <tr
+                        key={i}
+                        className="text-center border-b hover:bg-gray-100"
+                      >
+                        <td className="py-2 px-4 border">
+                          {income.date.slice(0, 10)}
+                        </td>
+                        <td className="py-2 px-4 border">{income.category}</td>
+                        <td className="py-2 px-4 border">
+                          ৳ {enToBn(income.income)}
+                        </td>
+                        <td className="py-2 px-4 border">
+                          {income.paymentMethod}
+                        </td>
+                        <td className="py-2 px-4 border">
+                          {income.note || "—"}
+                        </td>
+                        <td className="py-2 px-4 border">
+                          {income.attachmentImage ? (
+                            <img
+                              src={income.attachmentImage}
+                              alt="Income"
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                          ) : (
+                            "—"
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                )
+              )
             ) : (
               <tr>
                 <td colSpan="6" className="text-center py-4 text-gray-500">
-                  কোন খরচ পাওয়া যায়নি।
+                  কোন আয় পাওয়া যায়নি।
                 </td>
               </tr>
             )}

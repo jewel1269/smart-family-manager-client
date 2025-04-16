@@ -14,10 +14,16 @@ import {
 } from "@mui/icons-material";
 import React from "react";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { handleLogout } from "../services/api";
+import { Toaster } from "react-hot-toast";
 
 const MainLayout = () => {
   const admin = true;
+  const navigate = useNavigate();
+  const Logout = () => {
+    handleLogout(navigate);
+  };
   return (
     <div className="flex">
       <div>
@@ -62,7 +68,7 @@ const MainLayout = () => {
                 <ListAlt style={{ color: "#ff9800" }} /> আয় দেখো
               </MenuItem>
               <MenuItem component={<NavLink to="/expenseForm" />}>
-                <AddCircleOutline style={{ color: "#ff5722" }} /> ব্যয় সংযোজন 
+                <AddCircleOutline style={{ color: "#ff5722" }} /> ব্যয় সংযোজন
               </MenuItem>
               <MenuItem component={<NavLink to="/expenseList" />}>
                 <ListAlt style={{ color: "#ff5722" }} /> ব্যয় দেখো
@@ -121,12 +127,13 @@ const MainLayout = () => {
 
             <MenuItem
               icon={<LogoutRounded style={{ color: "#f44336" }} />}
-              component={<NavLink to="/logout" />}
+              onClick={() => Logout()}
             >
               লগআউট
             </MenuItem>
           </Menu>
         </Sidebar>
+        <Toaster/>
       </div>
 
       <div className="w-full">
