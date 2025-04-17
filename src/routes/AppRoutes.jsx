@@ -10,10 +10,11 @@ import TaskHome from "../features/task/task-home";
 import ExpenseList from "../features/forms/expanse-form/expense-list";
 import IncomeList from "../features/forms/income-form/income-list";
 import Savings from "../features/savings/savings";
-import DocumentManager from "../features/document-manager/document-manager";
 import Login from "../features/auth/Login";
 import PrivateRoute from "./PrivateRoute";
 import Register from "../features/auth/Register";
+import Calculator from "../features/calculator/calculator";
+import Semester from "../features/Admin/semester";
 
 
 const routes = createBrowserRouter([
@@ -36,7 +37,8 @@ const routes = createBrowserRouter([
       { path: "/groceryList", element: <GroceryList /> },
       { path: "/taskhome", element: <TaskHome /> },
       { path: "/savings", element: <Savings /> },
-      { path: "/documentManager", element: <DocumentManager /> },
+      { path: "/calculator", element: <Calculator /> },
+      { path: "/semester", element: <Semester /> },
     ],
   },
   {

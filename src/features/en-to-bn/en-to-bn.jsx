@@ -3,7 +3,9 @@ const enToBn = (num) => {
   return num
     .toString()
     .split("")
-    .map((digit) => bengaliNumerals[digit])
+    .map((char) =>
+      /\d/.test(char) ? bengaliNumerals[parseInt(char)] : char
+    )
     .join("");
 };
 

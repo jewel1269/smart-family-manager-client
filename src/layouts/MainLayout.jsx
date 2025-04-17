@@ -6,21 +6,23 @@ import {
   SavingsRounded,
   AccountCircleRounded,
   LogoutRounded,
-  DocumentScanner,
-  AttachMoney,
   ListAlt,
   ShoppingBasket,
   AddCircleOutline,
+  CalculateOutlined,
+  ResetTvOutlined,
 } from "@mui/icons-material";
 import React from "react";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { handleLogout } from "../services/api";
 import { Toaster } from "react-hot-toast";
+import useUser from "../hooks/useUser";
 
 const MainLayout = () => {
-  const admin = true;
   const navigate = useNavigate();
+  const { data } = useUser();
+  const user = data?.data || ""
   const Logout = () => {
     handleLogout(navigate);
   };
@@ -101,29 +103,30 @@ const MainLayout = () => {
             >
               ঋণ ও সঞ্চয়
             </MenuItem>
-
             <MenuItem
-              icon={<DocumentScanner style={{ color: "#607d8b" }} />}
-              component={<NavLink to="/documentManager" />}
+              icon={<CalculateOutlined style={{ color: "#607d8b" }} />}
+              component={<NavLink to="/calculator" />}
             >
-              ডকুমেন্টস ও নোটস
+              ক্যালকুলেটর
             </MenuItem>
 
-            {admin === true ? (
+            {user?.role === "admin"? (
               <MenuItem
-                icon={<AccountCircleRounded style={{ color: "#3f51b5" }} />}
-                component={<NavLink to="/profile" />}
+                icon={<ResetTvOutlined style={{ color: "#3f51b5" }} />}
+                component={<NavLink to="/semester" />}
               >
-                প্রোফাইল
+                সেমিস্টার তালিকা
               </MenuItem>
             ) : (
-              <MenuItem
-                icon={<AccountCircleRounded style={{ color: "#3f51b5" }} />}
-                component={<NavLink to="/profile" />}
-              >
-                প্রোফাইল2
-              </MenuItem>
+              ""
             )}
+
+            <MenuItem
+              icon={<AccountCircleRounded style={{ color: "#3f51b5" }} />}
+              component={<NavLink to="/profile" />}
+            >
+              প্রোফাইল
+            </MenuItem>
 
             <MenuItem
               icon={<LogoutRounded style={{ color: "#f44336" }} />}
@@ -133,7 +136,7 @@ const MainLayout = () => {
             </MenuItem>
           </Menu>
         </Sidebar>
-        <Toaster/>
+        <Toaster />
       </div>
 
       <div className="w-full">

@@ -1,16 +1,9 @@
 import React from "react";
+import useUser from "../hooks/useUser";
 
 const Profile = () => {
-const user = {
-    name: "জুয়েল মিয়া",
-    email: "johir@example.com",
-    phone: "+৮৮০১২৩৪৫৬৭৮৯০",
-    role: "ফুল স্ট্যাক ডেভেলপার",
-    location: "ঢাকা, বাংলাদেশ",
-    photoURL: "https://i.pravatar.cc/150?img=2",
-    about:
-        "আমি একজন উদ্যমী ফুল-স্ট্যাক ডেভেলপার যিনি MERN স্ট্যাক ব্যবহার করে স্কেলেবল ওয়েব অ্যাপ্লিকেশন তৈরি করতে পছন্দ করি। নতুন প্রযুক্তি শেখার এবং অন্বেষণ করার জন্য সর্বদা আগ্রহী।",
-};
+  const { data } = useUser();
+  const user = data?.data;
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4 flex justify-center items-start">
@@ -21,31 +14,37 @@ const user = {
           <div className="flex items-center space-x-6">
             <img
               className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
-              src={user.photoURL}
+              src={user?.profileImage || "/default-avatar.png"}
               alt="User avatar"
             />
             <div className="mt-10">
-              <h1 className="text-3xl font-bold text-gray-800">{user.name}</h1>
-              <p className="text-sm text-gray-500">{user.role}</p>
-              <p className="text-sm text-gray-400">{user.location}</p>
+              <h1 className="text-3xl font-bold text-gray-800">
+                {user?.name || "Unknown User"}
+              </h1>
+              <p className="text-sm text-gray-500">
+                {user?.role || "Role not specified"}
+              </p>
+              <p className="text-sm text-gray-400">
+                {user?.address || "No address provided"}
+              </p>
             </div>
           </div>
 
           <div className="mt-6">
             <h2 className="text-xl font-semibold text-gray-700 mb-2">About</h2>
             <p className="text-gray-600 text-sm leading-relaxed">
-              {user.about}
+              {user?.about || "--"}
             </p>
           </div>
 
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <h3 className="text-sm font-medium text-gray-500">📧 Email</h3>
-              <p className="text-gray-700">{user.email}</p>
+              <p className="text-gray-700">{user?.email || "--"}</p>
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-500">📞 Phone</h3>
-              <p className="text-gray-700">{user.phone}</p>
+              <p className="text-gray-700">{user?.phone || "--"}</p>
             </div>
           </div>
 
@@ -61,4 +60,3 @@ const user = {
 };
 
 export default Profile;
-
