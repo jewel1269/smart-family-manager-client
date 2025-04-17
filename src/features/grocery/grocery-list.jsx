@@ -1,10 +1,13 @@
 import React, { useState, useMemo } from "react";
 import useGroceryData from "../../hooks/useGroceryData";
 import enToBn from './../en-to-bn/en-to-bn';
+import axios from "axios";
+import { BaseUri } from "../../constants/uri";
+import toast from "react-hot-toast";
 
 const GroceryList = () => {
   const [filterMonth, setFilterMonth] = useState("");
-  const { data } = useGroceryData();
+  const { data, refetch } = useGroceryData();
   const items = data?.data || [];
 
   const monthFormatted = (dateStr) =>
@@ -35,9 +38,21 @@ const GroceryList = () => {
     return totals;
   }, [items]);
 
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${BaseUri}/api/v1/grocery/delete/${id}`);
+      toast.success("🗑️ সফলভাবে ডিলিট হয়েছে!");
+      refetch();
+    } catch (err) {
+      toast.error("❌ ডিলিট করতে সমস্যা হয়েছে");
+      console.error(err);
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto mt-12 px-4 sm:px-6 ">
-      <div className="bg-white shadow-xl rounded-3xl p-8">
+    <div className=" mx-auto mt-12 px-4 sm:px-6 ">
+      <div className="bg-white rounded-3xl p-8">
         <h2 className="text-4xl font-extrabold text-center text-gray-800 mb-10">
           📊 মাসভিত্তিক বাজার বিশ্লেষণ
         </h2>
@@ -81,7 +96,7 @@ const GroceryList = () => {
 
         {/* Table Section */}
         <div className="overflow-x-auto rounded-xl shadow-lg border">
-          <table className="min-w-full text-sm text-left text-gray-700">
+          <table className="min-w-full text-sm text-left text-black">
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-5 py-4">🛍️ প্রোডাক্ট</th>
@@ -90,6 +105,7 @@ const GroceryList = () => {
                 <th className="px-5 py-4">👤 কে কিনেছে</th>
                 <th className="px-5 py-4">📆 তারিখ</th>
                 <th className="px-5 py-4">📝 নোট</th>
+                <th className="px-5 py-4">❌ অ্যাকশন</th>
               </tr>
             </thead>
             <tbody>
@@ -97,7 +113,7 @@ const GroceryList = () => {
                 sortedItems.map((item, index) => (
                   <tr
                     key={index}
-                    className="border-b hover:bg-blue-50 transition duration-150"
+                    className="border-b hover:bg-blue-50 text-black transition duration-150"
                   >
                     <td className="px-5 py-3">{item.title}</td>
                     <td className="px-5 py-3">{item.category}</td>
@@ -107,6 +123,14 @@ const GroceryList = () => {
                       {new Date(item.date).toLocaleDateString("bn-BD")}
                     </td>
                     <td className="px-5 py-3">{item.note}</td>
+                    <td className="flex justify-start px-4 py-2">
+                        <button
+                          onClick={() => handleDelete(item._id)}
+                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                        >
+                          ডিলিট
+                        </button>
+                      </td>
                   </tr>
                 ))
               ) : (

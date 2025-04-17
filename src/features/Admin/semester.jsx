@@ -26,9 +26,9 @@ const Semester = () => {
     regFee: "",
   });
 
-  const { data, refetch} = useSemester();
- 
-  const semesters = data?.data || []
+  const { data, refetch } = useSemester();
+
+  const semesters = data?.data || [];
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -65,7 +65,7 @@ const Semester = () => {
       );
       if (response.status === 200) {
         toast.success("সেমিস্টার তথ্য সফলভাবে সংরক্ষণ করা হয়েছে।");
-        refetch()
+        refetch();
       }
     } catch (error) {
       console.error("ডেটা পাঠাতে সমস্যা হয়েছে:", error);
@@ -76,6 +76,17 @@ const Semester = () => {
     (acc, cur) => acc + cur.tuitionFee + cur.regFee,
     0
   );
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${BaseUri}/api/v1/semester/delete/${id}`);
+      toast.success("🗑️ সফলভাবে ডিলিট হয়েছে!");
+      refetch();
+    } catch (err) {
+      toast.error("❌ ডিলিট করতে সমস্যা হয়েছে");
+      console.error(err);
+    }
+  };
 
   const calculateCGPA = () => {
     let cgpas = [];
@@ -117,17 +128,32 @@ const Semester = () => {
             <th className="border p-2">৬০% টিউশন ফি</th>
             <th className="border p-2">রেজি: ফি</th>
             <th className="border p-2">মোট টাকা</th>
+            <th className="border p-2">অ্যাকশন</th>
           </tr>
         </thead>
         <tbody>
           {semesters.map((sem, idx) => (
             <tr key={idx}>
-              <td className="border p-2 text-center">{enToBn(sem.semesterNo)}</td>
+              <td className="border p-2 text-center">
+                {enToBn(sem.semesterNo)}
+              </td>
               <td className="border p-2 text-center">{enToBn(sem.creditNo)}</td>
               <td className="border p-2 text-center">{enToBn(sem.sgpa)}</td>
-              <td className="border p-2 text-center">{enToBn(sem.tuitionFee)} ৳</td>
+              <td className="border p-2 text-center">
+                {enToBn(sem.tuitionFee)} ৳
+              </td>
               <td className="border p-2 text-center">{enToBn(sem.regFee)} ৳</td>
-              <td className="border p-2 text-center">{enToBn(sem.regFee + sem?.tuitionFee)} ৳</td>
+              <td className="border p-2 text-center">
+                {enToBn(sem.regFee + sem?.tuitionFee)} ৳
+              </td>
+              <td className="border border-gray-400 flex justify-center p-2">
+                <button
+                  onClick={() => handleDelete(sem._id)}
+                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                >
+                  ডিলিট
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

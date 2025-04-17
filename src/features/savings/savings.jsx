@@ -1,256 +1,241 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { BaseUri } from "./../../constants/uri";
+import useEmail from "../auth/email";
+import useSaving from "../../hooks/useSaving";
+import enToBn from "./../en-to-bn/en-to-bn";
+import dayjs from "dayjs";
 
 const Savings = () => {
-  const [loans, setLoans] = useState(() => {
-    const saved = localStorage.getItem("loans");
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [amount, setAmount] = useState("");
-  const [type, setType] = useState("taken");
-  const [dueDate, setDueDate] = useState("");
-  const [loanDate, setLoanDate] = useState("");
-  const [person, setPerson] = useState("");
-  const [goal, setGoal] = useState(() => {
-    const savedGoal = localStorage.getItem("goal");
-    return savedGoal || "";
-  });
-  const [alertList, setAlertList] = useState([]);
-  const [filterMonth, setFilterMonth] = useState(() => {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
-      2,
-      "0"
-    )}`;
+  const email = useEmail();
+  const { data: Jewel, refetch } = useSaving();
+  const data = Jewel?.data || [];
+
+  const [selectedTab, setSelectedTab] = useState("taken");
+
+  const [form, setForm] = useState({
+    email,
+    amount: "",
+    type: "taken",
+    person: "",
+    loanDate: "",
+    dueDate: "",
   });
 
-  const getCurrentMonth = () => {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
-      2,
-      "0"
-    )}`;
+  // handle input change
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // set email on load
   useEffect(() => {
-    const monthKey = getCurrentMonth();
-    const existingMonthly =
-      JSON.parse(localStorage.getItem("monthlyLoans")) || {};
-    if (!existingMonthly[monthKey]) {
-      existingMonthly[monthKey] = [];
-      localStorage.setItem("monthlyLoans", JSON.stringify(existingMonthly));
+    if (email) {
+      setForm((prev) => ({ ...prev, email }));
     }
-  }, []);
+  }, [email]);
 
+  // set form.type dynamically when tab changes
   useEffect(() => {
-    const grouped = JSON.parse(localStorage.getItem("monthlyLoans")) || {};
-    setLoans(grouped[filterMonth] || []);
-  }, [filterMonth]);
+    setForm((prevForm) => ({
+      ...prevForm,
+      type: selectedTab,
+    }));
+  }, [selectedTab]);
 
-  const saveToLocalStorage = (newLoans) => {
-    const grouped = JSON.parse(localStorage.getItem("monthlyLoans")) || {};
-    grouped[filterMonth] = newLoans;
-    localStorage.setItem("monthlyLoans", JSON.stringify(grouped));
-    if (filterMonth === getCurrentMonth()) {
-      localStorage.setItem("loans", JSON.stringify(newLoans));
+  const handleSubmit = async () => {
+    const { amount, type, person, loanDate, dueDate } = form;
+    if (!amount || !type || !person || !loanDate || !dueDate) {
+      toast.error("⚠️ সব ফিল্ড পূরণ করুন");
+      return;
     }
-  };
 
-  const addLoan = () => {
-    if (!amount || !dueDate || !person || !loanDate)
-      return alert("দয়া করে সমস্ত তথ্য পূরণ করুন।");
-
-    const newLoan = {
+    const payload = {
+      ...form,
       id: Date.now(),
-      amount: parseFloat(amount),
-      type,
-      dueDate,
-      loanDate,
-      person,
     };
-    const updatedLoans = [...loans, newLoan];
-    setLoans(updatedLoans);
-    saveToLocalStorage(updatedLoans);
-    toast.success(`${type} সফলভাবে সম্পন্ন হয়েছে`);
 
-    setAmount("");
-    setDueDate("");
-    setLoanDate("");
-    setPerson("");
+    try {
+      await axios.post(`${BaseUri}/api/v1/saving/add`, payload);
+      toast.success("✅ সফলভাবে সংরক্ষণ হয়েছে!");
+      refetch();
+      setForm({
+        email,
+        amount: "",
+        type: selectedTab,
+        person: "",
+        loanDate: "",
+        dueDate: "",
+      });
+    } catch (err) {
+      toast.error("❌ ডেটা পাঠাতে সমস্যা হয়েছে");
+      console.error(err);
+    }
   };
 
-  const deleteLoan = (id) => {
-    const updatedLoans = loans.filter((loan) => loan.id !== id);
-    setLoans(updatedLoans);
-    saveToLocalStorage(updatedLoans);
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${BaseUri}/api/v1/saving/delete/${id}`);
+      toast.success("🗑️ সফলভাবে ডিলিট হয়েছে!");
+      refetch();
+    } catch (err) {
+      toast.error("❌ ডিলিট করতে সমস্যা হয়েছে");
+      console.error(err);
+    }
   };
 
-  const totalSavings = loans.reduce((acc, loan) => {
-    return loan.type === "given" || loan.type === "saving"
-      ? acc + loan.amount
-      : acc - loan.amount;
-  }, 0);
+  const filteredData = data.filter((item) => item.type === selectedTab);
+  const totalAmount = filteredData.reduce(
+    (sum, item) => sum + Number(item.amount),
+    0
+  );
 
-  const progress = goal ? Math.min((totalSavings / goal) * 100, 100) : 0;
-
-  useEffect(() => {
-    const today = new Date();
-    const upcoming = loans.filter((loan) => {
-      const due = new Date(loan.dueDate);
-      const diff = (due - today) / (1000 * 60 * 60 * 24);
-      return diff >= 0 && diff <= 3;
-    });
-    setAlertList(upcoming);
-  }, [loans]);
-
-  useEffect(() => {
-    localStorage.setItem("goal", goal);
-  }, [goal]);
+  const groupedData = filteredData.reduce((groups, item) => {
+    const month = dayjs(item.loanDate).format("MMMM YYYY");
+    if (!groups[month]) groups[month] = [];
+    groups[month].push(item);
+    return groups;
+  }, {});
 
   return (
-    <div className="max-w-7xl mx-auto mt-10 p-8 bg-white shadow-lg rounded-2xl space-y-6 border border-gray-200">
-      <h2 className="text-3xl font-bold text-center text-indigo-700">
-        💵 ঋণ ও সঞ্চয় ট্র্যাকার
+    <div className="max-w-5xl mx-auto p-6 mt-8 bg-white shadow-lg rounded-xl">
+      <Toaster />
+      <h2 className="text-3xl font-bold text-center mb-6 text-indigo-700">
+        💰 ঋণ ও সঞ্চয় ব্যবস্থাপনা
       </h2>
 
-      {/* মাস নির্বাচন */}
-      <div className="flex justify-center">
-        <input
-          type="month"
-          value={filterMonth}
-          onChange={(e) => setFilterMonth(e.target.value)}
-          className="border px-4 py-2 rounded focus:outline-indigo-500"
-        />
-      </div>
-
-      {/* ঋণ যুক্ত করার ফর্ম */}
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-          <input
-            type="number"
-            placeholder="পরিমাণ (৳)"
-            className="w-full border px-4 py-2 rounded focus:outline-indigo-500"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            className="border px-4 py-2 rounded focus:outline-indigo-500"
-          >
-            <option value="taken">ঋণ নেওয়া</option>
-            <option value="given">ঋণ দেয়া</option>
-            <option value="saving">সঞ্চয় </option>
-          </select>
-          <input
-            type="text"
-            placeholder="কার কাছে বা কাকে"
-            className="border px-4 py-2 rounded focus:outline-indigo-500"
-            value={person}
-            onChange={(e) => setPerson(e.target.value)}
-          />
-          <input
-            type="date"
-            className="border px-4 py-2 rounded focus:outline-indigo-500"
-            value={loanDate}
-            onChange={(e) => setLoanDate(e.target.value)}
-          />
-          <input
-            type="date"
-            className="border px-4 py-2 rounded focus:outline-indigo-500"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-          />
+      {/* Tab Selector */}
+      <div className="flex justify-center space-x-4 mb-6">
+        {[
+          { value: "taken", label: "ঋণ নেওয়া" },
+          { value: "given", label: "ঋণ দেয়া" },
+          { value: "saving", label: "সঞ্চয়" },
+        ].map((tab) => (
           <button
-            onClick={addLoan}
-            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
+            key={tab.value}
+            onClick={() => setSelectedTab(tab.value)}
+            className={`px-4 py-2 rounded ${
+              selectedTab === tab.value
+                ? "bg-indigo-600 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
           >
-            ➕ যুক্ত করুন
+            {tab.label}
           </button>
-        </div>
-
-        {/* মাসিক সঞ্চয় লক্ষ্য */}
-        <div className="flex items-center gap-4">
-          <input
-            type="number"
-            placeholder="🎯 মাসিক সঞ্চয় লক্ষ্য (৳)"
-            className="w-full border px-4 py-2 rounded focus:outline-indigo-500"
-            value={goal}
-            onChange={(e) => setGoal(e.target.value)}
-          />
-        </div>
+        ))}
       </div>
 
-      {/* ব্যালেন্স ও প্রগ্রেস */}
-      <div className="bg-gray-50 p-4 rounded shadow-inner">
-        <p className="text-lg font-semibold">
-          💰 বর্তমান ব্যালেন্স:{" "}
-          <span className="text-green-600">{totalSavings.toFixed(2)} ৳</span>
-        </p>
-        <div className="mt-3 w-full bg-gray-300 rounded-full h-4">
-          <div
-            className="bg-green-500 h-4 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          ></div>
-        </div>
-        <p className="text-sm text-right mt-1 text-gray-600">
-          অগ্রগতি: {progress.toFixed(1)}%
-        </p>
+      {/* Total Display */}
+      <div className="text-center mb-4 text-xl font-semibold text-green-600">
+        মোট{" "}
+        {selectedTab === "taken"
+          ? "ঋণ নেওয়া"
+          : selectedTab === "given"
+          ? "ঋণ দেয়া"
+          : "সঞ্চয়"}
+        : {totalAmount.toFixed(2)} ৳
       </div>
 
-      {/* ডিউ এলার্ট */}
-      {alertList.length > 0 && (
-        <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded">
-          <h4 className="font-semibold mb-2">
-            ⚠️ ৩ দিনের মধ্যে পরিশোধের সময়সীমা:
-          </h4>
-          <ul className="list-disc pl-6 space-y-1">
-            {alertList.map((loan) => (
-              <li key={loan.id}>
-                {loan.type === "taken"
-                  ? "ঋণ নেওয়া"
-                  : loan.type === "given"
-                  ? "ঋণ দেয়া"
-                  : "সঞ্চয়"}{" "}
-                — {loan.amount} ৳ (শেষ তারিখ: {loan.dueDate}, ব্যক্তি:{" "}
-                {loan.person})
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {/* Form */}
+      <div className="grid md:grid-cols-5 gap-4 mb-6">
+        <input
+          type="number"
+          name="amount"
+          placeholder="পরিমাণ (৳)"
+          value={form.amount}
+          onChange={handleChange}
+          className="border px-4 py-2 rounded"
+        />
+        <input
+          type="text"
+          name="person"
+          placeholder="কাকে / কার থেকে"
+          value={form.person}
+          onChange={handleChange}
+          className="border px-4 py-2 rounded"
+        />
+        <input
+          type="date"
+          name="loanDate"
+          value={form.loanDate}
+          onChange={handleChange}
+          className="border px-4 py-2 rounded"
+        />
+        <input
+          type="date"
+          name="dueDate"
+          value={form.dueDate}
+          onChange={handleChange}
+          className="border px-4 py-2 rounded"
+        />
+        <button
+          onClick={handleSubmit}
+          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+        >
+          ➕ সংরক্ষণ করুন
+        </button>
+      </div>
 
-      {/* সকল রেকর্ড এবং ডিলিট অপশন */}
-      {loans.length > 0 && (
-        <div className="bg-blue-50 border border-blue-300 px-4 py-3 rounded space-y-2">
-          <h4 className="font-semibold text-blue-800">📄 সকল রেকর্ড:</h4>
-          <ul className="space-y-1">
-            {loans.map((loan) => (
-              <li
-                key={loan.id}
-                className="flex justify-between items-center border p-2 rounded"
-              >
-                <span>
-                  {loan.type === "taken"
-                    ? "ঋণ নেওয়া"
-                    : loan.type === "given"
-                    ? "ঋণ দেয়া"
-                    : "সঞ্চয়"}{" "}
-                  — {loan.amount} ৳ | {loan.person} | প্রদান: {loan.loanDate} |
-                  পরিশোধ: {loan.dueDate}
-                </span>
-                <button
-                  onClick={() => deleteLoan(loan.id)}
-                  className="text-red-600 hover:underline"
-                >
-                  ❌ ডিলিট
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      <Toaster />
+      {/* Table View */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border border-gray-300">
+          <thead>
+            <tr className="bg-indigo-100">
+              <th className="border px-4 py-2">আইডি</th>
+              <th className="border px-4 py-2">পরিমাণ (৳)</th>
+              <th className="border px-4 py-2">ব্যক্তি</th>
+              <th className="border px-4 py-2">তারিখ</th>
+              <th className="border px-4 py-2">ডিউ তারিখ</th>
+              <th className="border px-4 py-2">অ্যাকশন</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.keys(groupedData).length === 0 ? (
+              <tr>
+                <td colSpan="6" className="text-center py-4 text-gray-500">
+                  কোনো তথ্য পাওয়া যায়নি।
+                </td>
+              </tr>
+            ) : (
+              Object.entries(groupedData).map(([month, items]) => (
+                <React.Fragment key={month}>
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="bg-gray-100 text-center font-semibold py-2"
+                    >
+                      📅 {month}
+                    </td>
+                  </tr>
+                  {items.map((item) => (
+                    <tr key={item.id} className="text-center">
+                      <td className="border px-4 py-2">
+                        {enToBn(item.id).slice(9)}
+                      </td>
+                      <td className="border px-4 py-2">
+                        {enToBn(item.amount)} ৳
+                      </td>
+                      <td className="border px-4 py-2">{item.person}</td>
+                      <td className="border px-4 py-2">{item.loanDate}</td>
+                      <td className="border px-4 py-2">
+                        {enToBn(item.dueDate)}
+                      </td>
+                      <td className="border px-4 py-2">
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                        >
+                          ডিলিট
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </React.Fragment>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
