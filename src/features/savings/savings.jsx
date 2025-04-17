@@ -98,7 +98,8 @@ const Savings = () => {
   }, {});
 
   return (
-    <div className="max-w-5xl mx-auto p-6 mt-8 bg-white shadow-lg rounded-xl">
+    <div className="lg:px-8">
+      <div className=" mx-auto p-6 mt-8 bg-white shadow-lg rounded-xl">
       <Toaster />
       <h2 className="text-3xl font-bold text-center mb-6 text-indigo-700">
         💰 ঋণ ও সঞ্চয় ব্যবস্থাপনা
@@ -236,6 +237,7 @@ const Savings = () => {
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   );
 };

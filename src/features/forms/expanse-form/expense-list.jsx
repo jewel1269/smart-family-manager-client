@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import enToBn from "../../en-to-bn/en-to-bn";
 import useCostData from "../../../hooks/useCostData";
+import axios from "axios";
+import { BaseUri } from "../../../constants/uri";
+import toast from "react-hot-toast";
+import { FaTrash } from "react-icons/fa";
 
 const ExpenseList = () => {
-  const { data } = useCostData();
+  const { data, refetch } = useCostData();
   const cost = data?.data || [];
+  console.log(cost);
 
   const [filterDate, setFilterDate] = useState("");
 
@@ -41,8 +46,20 @@ const ExpenseList = () => {
     })
     .sort((a, b) => new Date(b.month) - new Date(a.month)); // Sort by month
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${BaseUri}/api/v1/cost/delete/${id}`);
+      toast.success("🗑️ সফলভাবে ডিলিট হয়েছে!");
+      refetch();
+    } catch (err) {
+      toast.error("❌ ডিলিট করতে সমস্যা হয়েছে");
+      console.error(err);
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto mt-10 p-6 bg-white shadow-xl rounded-xl">
+   <div className="lg:px-10">
+     <div className=" mx-auto mt-10 p-6 bg-white shadow-xl rounded-xl">
       <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
         💳 খরচ তালিকা (ছবিসহ)
       </h2>
@@ -79,6 +96,7 @@ const ExpenseList = () => {
               <th className="py-2 px-4 border">💳 পেমেন্ট মাধ্যম</th>
               <th className="py-2 px-4 border">📝 নোট</th>
               <th className="py-2 px-4 border">🖼️ ছবি</th>
+              <th className="py-2 px-4 border">❌</th>
             </tr>
           </thead>
           <tbody>
@@ -106,10 +124,10 @@ const ExpenseList = () => {
                         <td className="py-2 px-4 border">
                           ৳ {enToBn(cost.cost)} {/* Display cost */}
                         </td>
-                        <td className="py-2 px-4 border">{cost.paymentMethod}</td>
                         <td className="py-2 px-4 border">
-                          {cost.note || "—"}
+                          {cost.paymentMethod}
                         </td>
+                        <td className="py-2 px-4 border">{cost.note || "—"}</td>
                         <td className="py-2 px-4 border">
                           {cost.attachmentImage ? (
                             <img
@@ -120,6 +138,14 @@ const ExpenseList = () => {
                           ) : (
                             "—"
                           )}
+                        </td>
+                        <td className="flex  border-gray-300 justify-center  py-2">
+                          <button
+                            onClick={() => handleDelete(cost._id)}
+                            className=" text-red-500"
+                          >
+                            <FaTrash className="h-10" />
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -137,6 +163,7 @@ const ExpenseList = () => {
         </table>
       </div>
     </div>
+   </div>
   );
 };
 

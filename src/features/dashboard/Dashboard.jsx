@@ -1,50 +1,74 @@
 import { Notifications } from "@mui/icons-material";
 import React from "react";
 import { NavLink } from "react-router-dom";
+import useGroceryData from "../../hooks/useGroceryData";
+import enToBn from "../en-to-bn/en-to-bn";
+import useCostData from "../../hooks/useCostData";
+import useIncomeData from "../../hooks/useIncomeData";
+import useSaving from "../../hooks/useSaving";
 
 const Dashboard = () => {
-  const [budget, setBudget] = React.useState("২০০০");
-  const [categories, setCategories] = React.useState([
-    { name: "খাবার", amount: "৫০০" },
-    { name: "বিল", amount: "৩০০" },
-    { name: "শপিং", amount: "৪০০" },
-  ]);
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [newBudget, setNewBudget] = React.useState("");
+  const { data } = useGroceryData();
+  const items = data?.data || [];
+  const { data: cost } = useCostData();
+  const expense = cost?.data || [];
+  const { data: income } = useIncomeData();
+  const incomes = income?.data || [];
+  const { data: Jewel } = useSaving();
+  const saving = Jewel?.data || [];
 
-  // বাংলা সংখ্যা → ইংরেজি সংখ্যা
-  const bnToEnNumber = (str) =>
-    str.replace(/[০-৯]/g, (d) => "০১২৩৪৫৬৭৮৯".indexOf(d));
+  const today = new Date();
+  const todayDateString = today.toLocaleDateString("en-CA");
 
-  // ইংরেজি সংখ্যা → বাংলা সংখ্যা
-  const enToBnNumber = (str) =>
-    str.toString().replace(/[0-9]/g, (d) => "০১২৩৪৫৬৭৮৯"[d]);
+  const todaysItems = items.filter((item) => {
+    const itemDate = new Date(item.date).toLocaleDateString("en-CA");
+    return itemDate === todayDateString;
+  });
 
-  const totalSpent = categories.reduce((acc, category) => {
-    return acc + parseInt(bnToEnNumber(category.amount), 10);
-  }, 0);
-
-  const totalBudget = parseInt(bnToEnNumber(budget), 10);
-  const remainingBudget = totalBudget - totalSpent;
-  const budgetPercentage =
-    totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(2) : 0;
-
-  const handleBudgetSubmit = () => {
-    if (newBudget) {
-      const converted = bnToEnNumber(newBudget);
-      setBudget(converted);
-      setIsModalOpen(false);
-      setNewBudget("");
+  const totalSpent = todaysItems.reduce(
+    (acc, item) => acc + Number(item.price || 0),
+    0
+  );
+  const categories = todaysItems.reduce((acc, item) => {
+    const category = item.category || "অন্যান্য";
+    if (!acc[category]) {
+      acc[category] = 0;
     }
-  };
+    acc[category] += Number(item.price || 0);
+    return acc;
+  }, {});
+
+  const categoryList = Object.entries(categories).map(([name, amount]) => ({
+    name,
+    amount: enToBn(amount),
+  }));
+
+  const totalIncome = incomes.reduce((acc, item) => acc + item?.income, 0);
+
+  const totalExpense = expense.reduce((acc, item) => acc + item?.cost, 0);
+
+  const totalLoanTaken = saving
+    .filter((item) => item.type === "taken")
+    .reduce((acc, item) => acc + Number(item.amount), 0);
+
+  const totalLoanGiven = saving
+    .filter((item) => item.type === "given")
+    .reduce((acc, item) => acc + Number(item.amount), 0);
+
+  const totalSavings = saving
+    .filter((item) => item.type === "saving")
+    .reduce((acc, item) => acc + Number(item.amount), 0);
 
   return (
     <div className="p-6 bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">📊 ড্যাশবোর্ড</h1>
-        <div className="flex items-center gap-1 mb-4">
+      {/* হেডার */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">📊 ড্যাশবোর্ড</h1>
+        <div className="flex items-center gap-1">
           <Notifications style={{ fontSize: 30, color: "red" }} />
-          <h2 className="text-lg font-semibold text-gray-800">নোটিফিকেশন (0)</h2>
+          <h2 className="text-lg font-semibold text-gray-800">
+            নোটিফিকেশন (0)
+          </h2>
         </div>
       </div>
 
@@ -53,97 +77,56 @@ const Dashboard = () => {
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           🗓️ আজকের সারাংশ
         </h2>
-        <p className="text-gray-600">
-          আপনি আজ <strong>{enToBnNumber(categories.length)}</strong>টি
-          ক্যাটাগরিতে মোট <strong>৳ {enToBnNumber(totalSpent)}</strong> টাকা খরচ
-          করেছেন।
-        </p>
-        <details className="mt-4">
-          <summary className="text-blue-600 font-medium cursor-pointer">
-            🔍 বিস্তারিত দেখুন
-          </summary>
-          <ul className="list-disc pl-6 mt-2 space-y-1 text-gray-700">
-            {categories.map((category, index) => (
-              <li key={index}>
-                {category.name}:{" "}
-                <span className="font-medium">৳{category.amount}</span>
-              </li>
-            ))}
-          </ul>
-        </details>
+        {todaysItems.length > 0 ? (
+          <>
+            <p className="text-gray-600">
+              আপনি আজ <strong>{enToBn(categoryList.length)}</strong>টি
+              ক্যাটাগরিতে মোট <strong>৳ {enToBn(totalSpent)}</strong> টাকা খরচ
+              করেছেন।
+            </p>
+            <details className="mt-4">
+              <summary className="text-blue-600 font-medium cursor-pointer">
+                🔍 বিস্তারিত দেখুন
+              </summary>
+              <ul className="list-disc pl-6 mt-2 space-y-1 text-gray-700">
+                {todaysItems.map((item, index) => (
+                  <li key={index}>
+                    {item.title} —{" "}
+                    <span className="font-medium">৳{enToBn(item.price)}</span>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </>
+        ) : (
+          <p className="text-gray-600">আজকের জন্য কোনো খরচ পাওয়া যায়নি।</p>
+        )}
       </section>
 
-      {/* মাসিক বাজেট পর্যালোচনা */}
-      <section className="bg-white rounded-2xl shadow-md p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-800">
-            📅 মাসিক বাজেট পর্যালোচনা
-          </h2>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="text-sm text-blue-600 hover:underline"
-          >
-            ➕ বাজেট যোগ করুন
-          </button>
-        </div>
-
-        <div className="flex justify-between items-center text-gray-700">
-          <span>ব্যবহৃত বাজেট:</span>
-          <span className="font-semibold text-blue-600">
-            ৳ {enToBnNumber(totalSpent)} / ৳ {enToBnNumber(budget)}
-          </span>
-        </div>
-
-        <div className="w-full bg-gray-200 rounded-full h-3 mt-3 overflow-hidden">
-          <div
-            className="bg-blue-500 h-3 transition-all duration-500"
-            style={{ width: `${budgetPercentage}%` }}
-          ></div>
-        </div>
-        <div className="flex justify-between items-center mt-2 text-gray-700">
-          <h1 className="text-sm text-red-500">
-            অবশিষ্ট বাজেটঃ ৳ {enToBnNumber(remainingBudget)}
-          </h1>
-          <p className="text-right text-sm mt-1 text-gray-500">
-            {enToBnNumber(budgetPercentage)}% খরচ হয়েছে
-          </p>
-        </div>
-      </section>
-
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0  bg-opacity-30 flex justify-center items-center z-50">
-          <div className="bg-amber-50 p-6 rounded-xl shadow-lg w-96">
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">
-              নতুন বাজেট দিন
-            </h3>
-            <input
-              type="text"
-              placeholder="যেমন: ৩০০০"
-              value={newBudget}
-              onChange={(e) => setNewBudget(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring focus:ring-blue-300"
-            />
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
-              >
-                বাতিল
-              </button>
-              <button
-                onClick={handleBudgetSubmit}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                সংরক্ষণ করুন
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* টাকার হিসাবের কার্ড */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card title="💰 মোট আয়" amount={enToBn(totalIncome)} color="green" />
+        <Card title="💸 মোট খরচ" amount={enToBn(totalExpense)} color="red" />
+        <Card
+          title="🛒 মোট বাজার খরচ"
+          amount={enToBn(totalSpent)}
+          color="blue"
+        />
+        <Card
+          title="📥 ঋণ নেওয়া"
+          amount={enToBn(totalLoanTaken)}
+          color="orange"
+        />
+        <Card
+          title="📤 ঋণ দেয়া"
+          amount={enToBn(totalLoanGiven)}
+          color="yellow"
+        />
+        <Card title="💼 সঞ্চয়" amount={enToBn(totalSavings)} color="purple" />
+      </div>
 
       {/* শর্টকাট */}
-      <section className="bg-white rounded-2xl shadow-md p-6">
+      <section className=" rounded-2xl mt-5 p-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           ⚡ দ্রুত এক্সেস শর্টকাট
         </h2>
@@ -177,6 +160,27 @@ const Dashboard = () => {
           </NavLink>
         </div>
       </section>
+    </div>
+
+    
+  );
+};
+
+// কার্ড কম্পোনেন্ট
+const Card = ({ title, amount, color }) => {
+  const bgColor = {
+    green: "bg-green-100 text-green-800",
+    red: "bg-red-100 text-red-800",
+    blue: "bg-blue-100 text-blue-800",
+    orange: "bg-orange-100 text-orange-800",
+    yellow: "bg-yellow-100 text-yellow-800",
+    purple: "bg-purple-100 text-purple-800",
+  };
+
+  return (
+    <div className={`rounded-2xl shadow p-6 ${bgColor[color]} transition-all`}>
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <p className="text-3xl font-bold">৳ {amount}</p>
     </div>
   );
 };
