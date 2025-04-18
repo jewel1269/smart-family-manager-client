@@ -47,8 +47,6 @@ const Semester = () => {
       regFee: parseFloat(formData.regFee),
     };
 
-    console.log(newSemester);
-
     setFormData({
       semesterNo: "",
       creditNo: "",
@@ -103,9 +101,9 @@ const Semester = () => {
 
   return (
     <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">সেমিস্টার তালিকা</h2>
-        <div>
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+        <h2 className="text-xl font-bold mb-2 sm:mb-0">সেমিস্টার তালিকা</h2>
+        <div className="flex flex-col sm:flex-row items-center">
           <span className="text-red-500 font-semibold mr-4">
             মোট খরচ : {enToBn(totalDue.toFixed(2))} টাকা
           </span>
@@ -119,7 +117,7 @@ const Semester = () => {
         </div>
       </div>
 
-      <table className="w-full border">
+      <table className="w-full border text-center">
         <thead>
           <tr className="bg-gray-200">
             <th className="border p-2">সেমিস্টার</th>
@@ -134,19 +132,15 @@ const Semester = () => {
         <tbody>
           {semesters.map((sem, idx) => (
             <tr key={idx}>
-              <td className="border p-2 text-center">
-                {enToBn(sem.semesterNo)}
-              </td>
-              <td className="border p-2 text-center">{enToBn(sem.creditNo)}</td>
-              <td className="border p-2 text-center">{enToBn(sem.sgpa)}</td>
-              <td className="border p-2 text-center">
-                {enToBn(sem.tuitionFee)} ৳
-              </td>
-              <td className="border p-2 text-center">{enToBn(sem.regFee)} ৳</td>
-              <td className="border p-2 text-center">
+              <td className="border p-2">{enToBn(sem.semesterNo)}</td>
+              <td className="border p-2">{enToBn(sem.creditNo)}</td>
+              <td className="border p-2">{enToBn(sem.sgpa)}</td>
+              <td className="border p-2">{enToBn(sem.tuitionFee)} ৳</td>
+              <td className="border p-2">{enToBn(sem.regFee)} ৳</td>
+              <td className="border p-2">
                 {enToBn(sem.regFee + sem?.tuitionFee)} ৳
               </td>
-              <td className="border border-gray-400 flex justify-center p-2">
+              <td className="border p-2">
                 <button
                   onClick={() => handleDelete(sem._id)}
                   className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
@@ -173,7 +167,7 @@ const Semester = () => {
       <div>
         <Dialog open={open} onClose={() => setOpen(false)}>
           <DialogTitle className="lg:w-96">নতুন সেমিস্টার তথ্য</DialogTitle>
-          <DialogContent className="flex  flex-col gap-4 mt-2">
+          <DialogContent className="flex flex-col gap-4 mt-2">
             <TextField
               name="semesterNo"
               label="সেমিস্টার নম্বর"

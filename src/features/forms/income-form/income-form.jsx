@@ -60,7 +60,7 @@ const IncomeForm = () => {
   const today = new Date().toISOString().split("T")[0];
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-2xl rounded-2xl">
+    <div className="max-w-4xl lg:mt-0 md:mt-5 mx-auto mt-12 p-6 bg-white shadow-2xl rounded-2xl">
       <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
         💰 আয় যোগ ফর্ম
       </h2>

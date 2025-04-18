@@ -60,10 +60,12 @@ const Dashboard = () => {
     .reduce((acc, item) => acc + Number(item.amount), 0);
 
   return (
-    <div className="p-6 bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen">
+    <div className="lg:p-4 p-2 sm:p-6 lg:mt-0 md:mt-5 mt-10 bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen">
       {/* হেডার */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">📊 ড্যাশবোর্ড</h1>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+          📊 ড্যাশবোর্ড
+        </h1>
         <div className="flex items-center gap-1">
           <Notifications style={{ fontSize: 30, color: "red" }} />
           <h2 className="text-lg font-semibold text-gray-800">
@@ -73,7 +75,7 @@ const Dashboard = () => {
       </div>
 
       {/* আজকের সারাংশ */}
-      <section className="bg-white rounded-2xl shadow-md p-6 mb-6">
+      <section className="bg-white rounded-2xl shadow-md p-4 sm:p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           🗓️ আজকের সারাংশ
         </h2>
@@ -104,7 +106,7 @@ const Dashboard = () => {
       </section>
 
       {/* টাকার হিসাবের কার্ড */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card title="💰 মোট আয়" amount={enToBn(totalIncome)} color="green" />
         <Card title="💸 মোট খরচ" amount={enToBn(totalExpense)} color="red" />
         <Card
@@ -126,11 +128,11 @@ const Dashboard = () => {
       </div>
 
       {/* শর্টকাট */}
-      <section className=" rounded-2xl mt-5 p-6">
+      <section className="rounded-2xl mt-5 p-4 sm:p-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           ⚡ দ্রুত এক্সেস শর্টকাট
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <NavLink
             to="/expenseForm"
             className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl shadow flex items-center justify-center text-center"
@@ -161,8 +163,6 @@ const Dashboard = () => {
         </div>
       </section>
     </div>
-
-    
   );
 };
 
@@ -178,9 +178,11 @@ const Card = ({ title, amount, color }) => {
   };
 
   return (
-    <div className={`rounded-2xl shadow p-6 ${bgColor[color]} transition-all`}>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-3xl font-bold">৳ {amount}</p>
+    <div
+      className={`rounded-2xl shadow p-4 sm:p-6 ${bgColor[color]} transition-all`}
+    >
+      <h3 className="text-lg sm:text-xl font-semibold mb-2">{title}</h3>
+      <p className="text-2xl sm:text-3xl font-bold">৳ {amount}</p>
     </div>
   );
 };

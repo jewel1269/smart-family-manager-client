@@ -63,7 +63,7 @@ const TaskHome = () => {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="lg:p-6 space-y-6 mt-12 lg:mt-0 md:mt-5 max-w-7xl mx-auto">
       {/* Header Card */}
       <div
         onClick={openModal}

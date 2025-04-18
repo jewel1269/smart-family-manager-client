@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import useGroceryData from "../../hooks/useGroceryData";
-import enToBn from './../en-to-bn/en-to-bn';
+import enToBn from "./../en-to-bn/en-to-bn";
 import axios from "axios";
 import { BaseUri } from "../../constants/uri";
 import toast from "react-hot-toast";
@@ -27,17 +27,15 @@ const GroceryList = () => {
 
   const totalBazar = sortedItems.reduce((sum, item) => sum + item.price, 0);
 
-  // ✅ সকল মাসের মোট খরচ বের করার জন্য গ্রুপ করা
   const monthlyTotals = useMemo(() => {
     const totals = {};
     items.forEach((item) => {
-      const month = item.date.slice(0, 7); 
+      const month = item.date.slice(0, 7);
       if (!totals[month]) totals[month] = 0;
       totals[month] += item.price;
     });
     return totals;
   }, [items]);
-
 
   const handleDelete = async (id) => {
     try {
@@ -51,9 +49,9 @@ const GroceryList = () => {
   };
 
   return (
-    <div className=" mx-auto mt-12 px-4 sm:px-6 ">
-      <div className="bg-white rounded-3xl p-8">
-        <h2 className="text-4xl font-extrabold text-center text-gray-800 mb-10">
+    <div className="mx-auto mt-12 lg:px-4 sm:px-6">
+      <div className="bg-white rounded-3xl lg:p-8 p-4">
+        <h2 className="lg:text-4xl text-xl font-extrabold text-center text-gray-800 mb-10">
           📊 মাসভিত্তিক বাজার বিশ্লেষণ
         </h2>
 
@@ -76,7 +74,7 @@ const GroceryList = () => {
           </div>
         </div>
 
-        {/* মাসভিত্তিক মোট খরচ দেখানো */}
+        {/* মাসভিত্তিক খরচ সারাংশ */}
         <div className="mb-10">
           <h3 className="text-lg font-semibold text-gray-700 mb-3">
             📅 মাসভিত্তিক খরচের সারাংশ:
@@ -94,36 +92,38 @@ const GroceryList = () => {
           </div>
         </div>
 
-        {/* Table Section */}
-        <div className="overflow-x-auto rounded-xl shadow-lg border">
-          <table className="min-w-full text-sm text-left text-black">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-5 py-4">🛍️ প্রোডাক্ট</th>
-                <th className="px-5 py-4">🏷️ ক্যাটাগরি</th>
-                <th className="px-5 py-4">💰 মূল্য (৳)</th>
-                <th className="px-5 py-4">👤 কে কিনেছে</th>
-                <th className="px-5 py-4">📆 তারিখ</th>
-                <th className="px-5 py-4">📝 নোট</th>
-                <th className="px-5 py-4">❌ অ্যাকশন</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedItems.length > 0 ? (
-                sortedItems.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="border-b hover:bg-blue-50 text-black transition duration-150"
-                  >
-                    <td className="px-5 py-3">{item.title}</td>
-                    <td className="px-5 py-3">{item.category}</td>
-                    <td className="px-5 py-3">{enToBn(item.price)}৳</td>
-                    <td className="px-5 py-3">{item.buyer}</td>
-                    <td className="px-5 py-3">
-                      {new Date(item.date).toLocaleDateString("bn-BD")}
-                    </td>
-                    <td className="px-5 py-3">{item.note}</td>
-                    <td className="flex justify-start px-4 py-2">
+        {/* Table / Card Section */}
+        <div className="overflow-hidden rounded-xl shadow-lg border">
+          {/* Desktop Table */}
+          <div className="hidden lg:block">
+            <table className="min-w-full text-sm text-left text-black">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-5 py-4">🛍️ প্রোডাক্ট</th>
+                  <th className="px-5 py-4">🏷️ ক্যাটাগরি</th>
+                  <th className="px-5 py-4">💰 মূল্য (৳)</th>
+                  <th className="px-5 py-4">👤 কে কিনেছে</th>
+                  <th className="px-5 py-4">📆 তারিখ</th>
+                  <th className="px-5 py-4">📝 নোট</th>
+                  <th className="px-5 py-4">❌</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedItems.length > 0 ? (
+                  sortedItems.map((item, index) => (
+                    <tr
+                      key={index}
+                      className="border-b hover:bg-blue-50 text-black transition duration-150"
+                    >
+                      <td className="px-5 py-3">{item.title}</td>
+                      <td className="px-5 py-3">{item.category}</td>
+                      <td className="px-5 py-3">{enToBn(item.price)}৳</td>
+                      <td className="px-5 py-3">{item.buyer}</td>
+                      <td className="px-5 py-3">
+                        {new Date(item.date).toLocaleDateString("bn-BD")}
+                      </td>
+                      <td className="px-5 py-3">{item.note}</td>
+                      <td className="flex justify-start px-4 py-2">
                         <button
                           onClick={() => handleDelete(item._id)}
                           className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
@@ -131,20 +131,59 @@ const GroceryList = () => {
                           ডিলিট
                         </button>
                       </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="text-center text-gray-500 italic py-6"
+                    >
+                      😴 এই মাসে কোনো বাজার তথ্য পাওয়া যায়নি।
+                    </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="6"
-                    className="text-center text-gray-500 italic py-6"
-                  >
-                    😴 এই মাসে কোনো বাজার তথ্য পাওয়া যায়নি।
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="lg:hidden flex flex-col gap-4 p-4">
+            {sortedItems.length > 0 ? (
+              sortedItems.map((item, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-50 rounded-xl p-4 shadow border"
+                >
+                  <div className="flex justify-between font-bold text-lg text-blue-700">
+                    <span>{item.title}</span>
+                    <span>{enToBn(item.price)}৳</span>
+                  </div>
+                  <div className="text-sm mt-2 space-y-1 text-gray-700">
+                    <p>🏷️ ক্যাটাগরি: {item.category}</p>
+                    <p>👤 ক্রেতা: {item.buyer}</p>
+                    <p>
+                      📆 তারিখ:{" "}
+                      {new Date(item.date).toLocaleDateString("bn-BD")}
+                    </p>
+                    {item.note && <p>📝 নোট: {item.note}</p>}
+                  </div>
+                  <div className="mt-3">
+                    <button
+                      onClick={() => handleDelete(item._id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    >
+                      ডিলিট
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-gray-500 italic py-6">
+                😴 এই মাসে কোনো বাজার তথ্য পাওয়া যায়নি।
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
