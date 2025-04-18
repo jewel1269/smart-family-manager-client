@@ -1,1 +1,1 @@
-export const BaseUri="http://localhost:5000"
+export const BaseUri="https://smart-family-backend.vercel.app"

@@ -10,7 +10,7 @@ const useIncomeData = () => {
     queryKey: ["incomeData", email],
     queryFn: async () => {
       const res = await axios.get(
-        `http://localhost:5000/api/v1/income/${email}`
+        `https://smart-family-backend.vercel.app/api/v1/income/${email}`
       );
       return res.data;
     },

@@ -9,7 +9,7 @@ const useSemester = () => {
     queryKey: ["semesterData", email],
     queryFn: async () => {
       const res = await axios.get(
-        `http://localhost:5000/api/v1/semester/${email}`
+        `https://smart-family-backend.vercel.app/api/v1/semester/${email}`
       );
       return res.data;
     },

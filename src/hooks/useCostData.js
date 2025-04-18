@@ -10,7 +10,7 @@ const useCostData = () => {
     queryKey: ["costData", email],
     queryFn: async () => {
       const res = await axios.get(
-        `http://localhost:5000/api/v1/cost/${email}`
+        `https://smart-family-backend.vercel.app/api/v1/cost/${email}`
       );
       return res.data;
     },

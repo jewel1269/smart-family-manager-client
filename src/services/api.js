@@ -2,7 +2,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import Cookies from "js-cookie";
 
-const BaseUri = "http://localhost:5000";
+const BaseUri = "https://smart-family-backend.vercel.app";
 
 export const LoginUser = async (userData, navigate) => {
   if (userData) {

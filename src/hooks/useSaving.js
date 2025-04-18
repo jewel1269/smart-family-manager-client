@@ -10,7 +10,7 @@ const useSaving = () => {
     queryKey: ["savingData", email],
     queryFn: async () => {
       const res = await axios.get(
-        `http://localhost:5000/api/v1/saving/${email}`
+        `https://smart-family-backend.vercel.app/api/v1/saving/${email}`
       );
       return res.data;
     },
