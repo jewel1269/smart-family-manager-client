@@ -13,7 +13,7 @@ export const LoginUser = async (userData, navigate) => {
       );
 
       if (response.status === 200) {
-        toast.success("লগইন সফল!");
+        toast.success("OTP ভেরিফিকেশন করুন!");
 
         Cookies.set("email", userData.email, {
           expires: 5,
@@ -22,12 +22,10 @@ export const LoginUser = async (userData, navigate) => {
         });
 
         setTimeout(() => {
-          navigate("/dashboard");
+          navigate("/otpVerify");
         }, 2000);
       } else {
-        toast.error(
-          `Error: ${response.data.message || "Something went wrong"}`
-        );
+        console.log("");
       }
     } catch (error) {
       console.error(error);

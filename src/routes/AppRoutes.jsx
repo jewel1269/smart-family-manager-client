@@ -15,6 +15,7 @@ import PrivateRoute from "./PrivateRoute";
 import Register from "../features/auth/Register";
 import Calculator from "../features/calculator/calculator";
 import Semester from "../features/Admin/semester";
+import OtpVerification from "../features/auth/OtpVerification";
 
 
 const routes = createBrowserRouter([
@@ -48,6 +49,10 @@ const routes = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
+  },
+  {
+    path: "/otpVerify",
+    element: <OtpVerification />,
   },
 ]);
 
